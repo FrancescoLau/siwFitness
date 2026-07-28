@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nuova Recensione - Fitness App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    
+    <!-- Navigazione Superiore -->
+    <div class="auth-header">
+        <div class="auth-header-content">
+            <div>
+                <a th:href="@{/}" class="logo">🏋️ Fitness App</a>
+            </div>
+            <div class="auth-menu">
+                <span class="user-welcome-text">👤 Benvenuto, <strong sec:authentication="name">Utente</strong></span>
+                <a th:href="@{/allenamentiConsigliati}" class="btn btn-secondary">📋 Programmi Consigliati</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenitore Principale -->
+    <div class="container">
+        
+        <!-- Header con stile energetico blu -->
+        <div class="header">
+            <h1>⭐ Lascia una Recensione</h1>
+            <p th:text="'Stai valutando l\'allenamento: ' + ${allenamento.nome}">Valuta il programma consigliato</p>
+        </div>
+        
+        <div class="form-container">
+            <!-- Form mappato sull'azione post corretta del controller -->
+            <form th:action="@{'/allenamentoConsigliato/' + ${allenamento.id} + '/nuovaRecensione'}" th:object="${recensione}" method="post">
+                
+                <!-- Box d'errore globale del Validator (es: recensione duplicata) -->
+                <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                    <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                </div>
+                
+                <!-- Campo Voto -->
+                <div class="form-group">
+                    <label for="voto">📊 Il tuo Voto (da 1 a 5):</label>
+                    <select id="voto" th:field="*{voto}" >
+                        <option value="">Seleziona un punteggio</option>
+                        <option value="5">⭐⭐⭐⭐⭐ (Eccellente)</option>
+                        <option value="4">⭐⭐⭐⭐ (Buono)</option>
+                        <option value="3">⭐⭐⭐ (Sufficiente)</option>
+                        <option value="2">⭐⭐ (Scarso)</option>
+                        <option value="1">⭐ (Pessimo)</option>
+                    </select>
+                    <span th:if="${#fields.hasErrors('voto')}" th:errors="*{voto}" class="alert alert-danger" style="display:block; margin-top:5px; padding:5px; border-radius:4px;"></span>
+                </div>
+                
+                <!-- Campo Testo Recensione -->
+                <div class="form-group">
+                    <label for="testo">📝 Commento dell'Allenamento:</label>
+                    <textarea id="testo" th:field="*{testo}"  maxlength="500"
+                              placeholder="Raccontaci la tua esperienza con questo programma di allenamento, gli esercizi eseguiti, i punti di forza..."></textarea>
+                    <div class="image-instructions-box" style="margin-top: 5px; background-color: #f8f9fa;">
+                        💡 Condividi un feedback onesto per aiutare gli altri membri della community. Massimo 500 caratteri.
+                    </div>
+                    <span th:if="${#fields.hasErrors('testo')}" th:errors="*{testo}" class="alert alert-danger" style="display:block; margin-top:5px; padding:5px; border-radius:4px;"></span>
+                </div>
+                
+                <!-- Pulsanti di Azione posizionati al centro -->
+                <div class="navigation">
+                    <button type="submit" class="btn">🚀 Invia Recensione</button>
+                    <a th:href="@{'/allenamentoConsigliato/' + ${allenamento.id} + '/recensioni'}" class="btn btn-secondary">❌ Annulla</a>
+                </div>
+				<div class="navigation">
+						      <a href="/" class="btn btn-secondary">🏠 Torna alla Home</a> 
+				</div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

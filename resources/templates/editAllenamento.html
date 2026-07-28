@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Modifica Allenamento - Fitness App</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <div class="auth-header">
+        <div class="auth-header-content">
+            <div>
+                <a th:href="@{/}" class="logo">🏋️ Fitness App</a>
+            </div>
+            <div class="auth-menu" sec:authorize="isAuthenticated()">
+                <span class="user-welcome-text">👤 Benvenuto, <span sec:authentication="name">Utente</span>!</span>
+                <a th:href="@{/allenamenti}" class="btn btn-warning">📋 I Miei Allenamenti</a>
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-secondary">🚪 Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header header-warning">
+            <h1>✏️ Gestione Allenamento</h1>
+            <p>Compila i campi sottostanti per salvare le modifiche della tua attività</p>
+        </div>
+
+        <div class="form-container">
+            <!-- Messaggio d'errore globale -->
+            <div th:if="${errorMessage}" class="alert alert-danger" style="margin-bottom: 20px;">
+                <span th:text="${errorMessage}">Errore durante il caricamento</span>
+            </div>
+
+            <form th:action="@{/editAllenamento/{id}(id=${allenamento.id})}" 
+                  th:object="${allenamento}"
+                  method="post" 
+                  enctype="multipart/form-data">
+                
+                <input type="hidden" th:field="*{id}" />
+                <input type="hidden" th:field="*{utente}" />
+                <input type="hidden" th:field="*{isPubblico}" />
+
+                <div class="form-group">
+                    <label for="nome">🏷️ Titolo Allenamento:</label>
+                    <input type="text" id="nome" th:field="*{nome}" required>
+                    <span th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" class="alert-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoSport">🏋️ Tipo di Sport:</label>
+                    <input type="text" id="tipoSport" th:field="*{tipoSport}" required>
+                    <span th:if="${#fields.hasErrors('tipoSport')}" th:errors="*{tipoSport}" class="alert-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="data">📅 Data:</label>
+                    <input type="date" id="data" th:field="*{data}" required>
+                    <span th:if="${#fields.hasErrors('data')}" th:errors="*{data}" class="alert-danger"></span>
+                </div> 
+
+                <div class="form-group">
+                    <label for="durata">⏱️ Durata:</label>
+                    <input type="time" id="durata" th:field="*{durata}" required>
+                    <span th:if="${#fields.hasErrors('durata')}" th:errors="*{durata}" class="alert-danger"></span>
+                </div>
+
+                <!-- Sezione Immagine con Gestione Errore -->
+                <div class="image-section">
+                    <label for="imageFile">🖼️ Cambia Immagine (opzionale, max 5MB):</label>
+                    <input type="file" id="imageFile" name="imageFile" accept="image/*">
+                    
+                    <!-- ERRORE VALIDAZIONE IMMAGINE -->
+                    <span th:if="${#fields.hasErrors('immagine')}" th:errors="*{immagine}" class="alert-danger"></span>
+
+                    <div class="image-instructions-box">
+                        💡 Seleziona un nuovo file dal PC solo se desideri sostituire l'immagine attuale (Max 5MB).
+                    </div>
+                                    
+                    <div th:if="${allenamento.immagine != null and allenamento.immagine.url != null}" class="current-image">
+                        <p class="review-italic-text">Immagine attualmente in uso:</p>
+                        <div class="card-img-container">
+                            <img th:src="${allenamento.immagine.url}" alt="Immagine dell'allenamento" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="descrizione">📝 Descrizione / Note:</label>
+                    <textarea id="descrizione" th:field="*{descrizione}"></textarea>
+                    <span th:if="${#fields.hasErrors('descrizione')}" th:errors="*{descrizione}" class="alert-danger"></span>
+                </div>
+                
+                <div class="navigation">
+                    <button type="submit" class="btn btn-warning">💾 Salva Configurazione</button>
+                    <a th:href="@{/allenamenti}" class="btn btn-secondary">❌ Annulla</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
