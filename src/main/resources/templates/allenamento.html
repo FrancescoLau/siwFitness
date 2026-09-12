@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${allenamento.nome} + ' - Fitness App'">Allenamento - Fitness App</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="auth-header">
+        <div class="auth-header-content">
+            <div>
+                <a th:href="@{/}" class="logo">🏋️ Fitness App</a>
+            </div>
+            
+            <div class="auth-menu">
+                <div sec:authorize="isAuthenticated()">
+                    <span class="user-welcome-text">👤 Utente: <span sec:authentication="name">Nome</span></span>
+                    <a th:href="@{/allenamenti}" class="btn">📋 I Miei Allenamenti</a>
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-secondary">🚪 Logout</button>
+                    </form>
+                </div>
+                <div sec:authorize="isAnonymous()">
+                    <a th:href="@{/login}" class="btn">🔐 Accedi</a>
+                    <a th:href="@{/register}" class="btn btn-success">📝 Registrati</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${allenamento.nome}">Nome Allenamento</h1>
+            <p>Dettagli completi della sessione selezionata</p>
+        </div>
+        
+        <div class="allenamento-detail">
+
+            <div class="detail-row">
+                <div class="detail-label">🏋️ Sport:</div>
+                <div class="detail-value" th:text="${allenamento.tipoSport}">Tipo Sport</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">📅 Data:</div>
+                <div class="detail-value" th:text="${allenamento.data}">Data</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">⏱️ Durata:</div>
+                <div class="detail-value" th:text="${#temporals.format(allenamento.durata, 'HH:mm')}">Durata</div>
+            </div>
+
+            <div class="detail-row" th:if="${allenamento.livelloDifficolta != null}">
+                <div class="detail-label">📊 Livello:</div>
+                <div class="detail-value" th:text="${allenamento.livelloDifficolta}">Livello</div>
+            </div>
+            
+            <div th:if="${allenamento.descrizione != null and !allenamento.descrizione.isEmpty()}">
+                <h3 class="reviews-header-title">📝 Note / Descrizione:</h3>
+                <div class="description" th:text="${allenamento.descrizione}">
+                    Descrizione dell'allenamento
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions" style="margin-top: 20px;">
+            <a th:href="@{/editAllenamento/{id}(id=${allenamento.id})}" class="btn btn-warning">✏️ Modifica</a>
+            <form th:action="@{/deleteAllenamento/{id}(id=${allenamento.id})}" 
+                  method="post" 
+                  class="d-inline"
+                  onsubmit="return confirm('Sei sicuro di voler cancellare questo allenamento?')">
+                <button type="submit" class="btn btn-danger">🗑️ Elimina</button>
+            </form>
+        </div>
+        
+        <div class="navigation" style="margin-top: 15px;">
+            <a th:href="@{/allenamenti}" class="btn btn-secondary">📋 Torna alla Lista</a>
+            <a th:href="@{/}" class="btn btn-secondary">🏠 Home</a>
+        </div>
+    </div>
+</body>
+</html>
