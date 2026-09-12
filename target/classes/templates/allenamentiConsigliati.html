@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allenamenti Consigliati - SIW Fitness</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header di Autenticazione e Navigazione Superiore -->
+    <header class="auth-header">
+        <div class="auth-header-content">
+            <a th:href="@{/}" class="logo">SIW FITNESS</a>
+            <div class="auth-menu">
+                <!-- Messaggio di benvenuto per utenti autenticati -->
+                <span sec:authorize="isAuthenticated()" class="user-welcome-msg">
+                    Ciao, <span sec:authentication="name">Utente</span>!
+                </span>
+
+                <a sec:authorize="hasAuthority('DEFAULT')"  
+				th:href="@{/allenamenti}" class="btn btn-secondary">I Miei Allenamenti</a>
+
+                <!-- Pulsante visibile solo all'Admin -->
+                <a sec:authorize="hasAuthority('ADMIN')" 
+                   th:href="@{/admin/formNewAllenamentoConsigliato}" 
+                   class="btn btn-warning">+ Nuovo Consigliato</a>
+
+                <!-- Opzioni Logout / Login -->
+                <a sec:authorize="isAuthenticated()" th:href="@{/logout}" class="btn btn-secondary">Logout</a>
+                <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn">Accedi</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Hero Header -->
+        <div class="header">
+            <h1>Allenamenti Consigliati</h1>
+            <p>Scopri e segui i programmi di allenamento raccomandati dai nostri coach</p>
+        </div>
+
+        <!-- Avviso Nessun Risultato -->
+        <div th:if="${allenamentiConsigliati == null or #lists.isEmpty(allenamentiConsigliati)}" class="form-container">
+            <p class="rating-italic-msg title-centered-spaced">Nessun allenamento consigliato disponibile al momento.</p>
+        </div>
+
+        <!-- Lista Cards Allenamenti Consigliati -->
+        <div th:if="${allenamentiConsigliati != null and !#lists.isEmpty(allenamentiConsigliati)}">
+            <div th:each="allenamento : ${allenamentiConsigliati}" class="allenamento-card-layout">
+              
+                <!-- Informazioni Allenamento (Sinistra) -->
+                <div class="allenamento-info-left">
+                    <h2>
+                        <span th:text="${allenamento[0].nome}">Corsa Campestre</span>
+                    </h2>
+
+                    <!-- Conteggio aggregato calcolato da PostgreSQL (Posizione [1] della tupla) -->
+                    <div class="detail-row">
+                        <span class="detail-label">Recensioni ricevute:</span>
+                        <span class="detail-value" th:text="${allenamento[1]}">0</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Sport:</span>
+                        <span class="detail-value" th:text="${allenamento[0].tipoSport}">Corsa</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Difficoltà:</span>
+                        <span class="detail-value" th:text="${allenamento[0].livelloDifficolta}">Intermedio</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Durata:</span>
+                        <span class="detail-value" th:text="${allenamento[0].durata}">01:00:00</span>
+                    </div>
+
+                    <div class="description" 
+                         th:if="${allenamento[0].descrizione != null and !allenamento[0].descrizione.isBlank()}" 
+                         th:text="${allenamento[0].descrizione}">
+                        Descrizione dettagliata dell'allenamento consigliato.
+                    </div>
+
+                    <!-- Azioni Rapide -->
+                    <div>
+                        <a th:href="@{'/allenamento/' + ${allenamento[0].id} + '/recensioni'}" class="btn btn-secondary">Visualizza Recensioni</a>
+                        
+                        <!-- Controlli Riservati all'Admin gestiti tramite sec:authorize -->
+                        <span sec:authorize="hasAuthority('ADMIN')" class="d-inline">
+                            <a th:href="@{'/admin/editAllenamentoConsigliato/' + ${allenamento[0].id}}" class="btn btn-warning">Modifica</a>
+                            <form th:action="@{'/deleteAllenamento/' + ${allenamento[0].id}}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Sicuro di voler eliminare questo allenamento consigliato?');">Elimina</button>
+                            </form>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Navigazione Inferiore -->
+        <div class="navigation-centered">
+            <a th:href="@{/}" class="btn btn-secondary">Torna alla Home</a>
+        </div>
+    </div>
+
+</body>
+</html>
